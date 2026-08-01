@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나의 이상적 연애 찾기</title>
+<style>
+  :root {
+    --bg: #faf7f4;
+    --card: #ffffff;
+    --ink: #2b2733;
+    --sub: #6f6879;
+    --accent: #e2566e;
+    --accent-soft: #fdeef1;
+    --accent2: #7a5af5;
+    --accent2-soft: #f1edfe;
+    --line: #ece7e2;
+    --radius: 18px;
+    --shadow: 0 6px 24px rgba(60, 40, 70, .08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, #fdeef1 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 30%, #f1edfe 0%, transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    min-height: 100vh;
+    word-break: keep-all;
+  }
+  /* 휴대폰 화면 비율 기준 레이아웃 */
+  .wrap { max-width: 420px; margin: 0 auto; padding: 28px 18px 70px; }
+
+  /* 손그림 이미지 공통 (흰 배경 제거 효과) */
+  .hand-img { mix-blend-mode: multiply; }
+
+  /* ---------- 공통 ---------- */
+  .screen { display: none; animation: fadein .35s ease; }
+  .screen.active { display: block; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  .badge {
+    display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: .04em;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 5px 12px; border-radius: 999px; margin-bottom: 14px;
+  }
+  h1 { font-size: 30px; line-height: 1.35; margin-bottom: 14px; }
+  .lead { color: var(--sub); font-size: 16px; }
+
+  .btn {
+    display: inline-block; border: 0; cursor: pointer; font-family: inherit;
+    font-size: 17px; font-weight: 700; color: #fff;
+    background: linear-gradient(135deg, var(--accent), #d4437c);
+    padding: 15px 34px; border-radius: 999px;
+    box-shadow: 0 8px 20px rgba(226, 86, 110, .3);
+    transition: transform .15s ease, box-shadow .15s ease, opacity .15s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(226, 86, 110, .38); }
+  .btn:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
+  .btn-ghost {
+    background: none; border: 1.5px solid var(--line); color: var(--sub);
+    box-shadow: none; font-weight: 600;
+  }
+  .btn-ghost:hover:not(:disabled) { box-shadow: none; border-color: #cfc8c1; }
+
+  /* ---------- 인트로 ---------- */
+  #intro { text-align: center; padding-top: 40px; }
+  #intro .heart-img { width: 92px; margin-bottom: 16px; }
+  #intro .title-img { width: 100%; max-width: 330px; display: block; margin: 4px auto 16px; }
+  .img-btn {
+    display: inline-block; cursor: pointer; font-family: inherit;
+    background: #fff; border: 2.5px solid #6b6259; border-radius: 999px;
+    padding: 12px 30px 9px; box-shadow: 0 6px 16px rgba(107, 98, 89, .18);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .img-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(107, 98, 89, .25); }
+  .img-btn img { height: 30px; display: block; }
+  #intro .steps {
+    text-align: left; margin: 34px auto 38px; max-width: 460px;
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 26px 28px;
+  }
+  #intro .steps li { list-style: none; display: flex; gap: 14px; align-items: flex-start; padding: 10px 0; }
+  #intro .steps .num {
+    flex: none; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent2-soft); color: var(--accent2);
+    font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+    margin-top: 3px;
+  }
+  #intro .note { font-size: 13px; color: #a49dae; margin-top: 22px; }
+
+  /* ---------- 상황 선택 ---------- */
+  .picker-head { margin-bottom: 20px; }
+  .picker-head h2 { font-size: 23px; margin-bottom: 6px; }
+  .picker-head p { color: var(--sub); font-size: 15px; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 11px; }
+  .sit-card {
+    background: var(--card); border: 2px solid var(--line); border-radius: 14px;
+    padding: 15px 16px; cursor: pointer; user-select: none; position: relative;
+    font-size: 15.5px; font-weight: 600; transition: all .15s ease;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sit-card:hover { border-color: #d9d2ec; transform: translateY(-1px); }
+  .sit-card .no { color: #c9c2d2; font-weight: 800; font-size: 13px; flex: none; }
+  .sit-card.sel { border-color: var(--accent); background: var(--accent-soft); }
+  .sit-card.sel .no { color: var(--accent); }
+  .sit-card.dim { opacity: .45; pointer-events: none; }
+  .picker-foot {
+    position: sticky; bottom: 16px; margin-top: 26px; text-align: center;
+  }
+  .picker-foot .count { font-size: 14px; color: var(--sub); margin-bottom: 10px; }
+  .picker-foot .count b { color: var(--accent); font-size: 16px; }
+
+  /* ---------- 질문 ---------- */
+  .progress { height: 6px; background: #eee7ef; border-radius: 99px; overflow: hidden; margin-bottom: 10px; }
+  .progress .bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    border-radius: 99px; transition: width .3s ease;
+  }
+  .q-meta { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #a49dae; margin-bottom: 26px; }
+  .q-scene {
+    display: inline-block; font-size: 13px; font-weight: 700;
+    color: var(--accent2); background: var(--accent2-soft);
+    padding: 5px 12px; border-radius: 999px; margin-bottom: 14px;
+  }
+  .q-scene.flip { color: var(--accent); background: var(--accent-soft); }
+  .q-text { font-size: 21px; font-weight: 800; line-height: 1.5; margin-bottom: 24px; }
+  .opts { display: flex; flex-direction: column; gap: 11px; }
+  .opt {
+    background: var(--card); border: 2px solid var(--line); border-radius: 14px;
+    padding: 16px 18px; cursor: pointer; font-size: 15.5px; text-align: left;
+    font-family: inherit; color: var(--ink); line-height: 1.55;
+    transition: all .13s ease; width: 100%;
+  }
+  .opt:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateX(3px); }
+  .q-back { margin-top: 24px; }
+  .q-back button {
+    background: none; border: 0; color: #b0a9ba; font-size: 14px; cursor: pointer; font-family: inherit;
+  }
+  .q-back button:hover { color: var(--sub); }
+
+  /* ---------- 결과 ---------- */
+  .r-head { text-align: center; margin-bottom: 26px; }
+  .r-head .badge { margin-bottom: 12px; }
+  .r-head .rtitle-img { width: 100%; max-width: 340px; display: block; margin: 0 auto 10px; }
+  .r-head h2 { font-size: 26px; color: var(--accent); }
+  .sec {
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 30px 28px; margin-bottom: 22px;
+  }
+  @media (max-width: 520px) { .sec { padding: 24px 20px; } }
+  .sec h3 { font-size: 20px; margin-bottom: 16px; }
+  .sec p { font-size: 15.5px; color: #4c4556; }
+  .sec p + p { margin-top: 12px; }
+
+  /* 섹션 1: 단추 유형 */
+  .sec-type { text-align: center; }
+  .button-img { width: 200px; max-width: 65%; display: block; margin: 4px auto 20px; }
+  .sec-type .explain { text-align: left; margin-top: 18px; }
+
+  /* 욕망 그래프 (손그림 도넛) */
+  #radarBox { display: flex; justify-content: center; margin: 6px 0 10px; }
+  #radarBox svg { max-width: 100%; height: auto; flex: none; }
+  .donut-wrap { display: flex; align-items: center; justify-content: center; gap: 30px; flex-wrap: wrap; }
+  .legend { display: flex; flex-direction: column; gap: 10px; min-width: 170px; }
+  .lg-row { display: flex; align-items: center; gap: 10px; font-size: 15px; }
+  .lg-row.etc { opacity: .65; font-size: 14px; }
+  .lg-dot { flex: none; width: 14px; height: 14px; border-radius: 5px; border: 2px solid #6b6259; }
+  .lg-name { flex: 1; font-weight: 700; color: #555060; }
+  .lg-pc { font-weight: 800; color: var(--ink); }
+  .rank-list { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .rank-row { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+  .rank-row .nm { flex: none; width: 84px; font-weight: 700; color: #555060; }
+  .rank-row .track { display: block; flex: 1; height: 8px; background: #f1ecf3; border-radius: 99px; overflow: hidden; }
+  .rank-row .fill { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #e8b4ba, #d97757); }
+  .rank-row .pc { flex: none; width: 44px; text-align: right; font-weight: 700; color: var(--sub); font-size: 13px; }
+  .rank-row.top .nm, .rank-row.top .pc { color: #d97757; }
+
+  .hook {
+    font-size: 19px; font-weight: 800; line-height: 1.6; color: var(--ink);
+    background: linear-gradient(135deg, var(--accent-soft), var(--accent2-soft));
+    border-radius: 14px; padding: 24px 22px; text-align: center;
+  }
+  .hook::before { content: "“"; color: var(--accent); font-size: 26px; }
+  .hook::after { content: "”"; color: var(--accent); font-size: 26px; }
+
+  .strat-head {
+    font-size: 18px; font-weight: 800; line-height: 1.55;
+    padding: 18px 20px; border-radius: 14px;
+    background: var(--accent2-soft); color: #4a3d86; margin-bottom: 18px;
+  }
+  .strat-sub { font-size: 13px; font-weight: 800; letter-spacing: .05em; color: var(--accent); margin: 20px 0 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .chip {
+    font-size: 13px; font-weight: 700; color: var(--sub);
+    background: #f4f0f6; border-radius: 999px; padding: 6px 13px;
+  }
+  .chip b { color: var(--accent2); }
+  .healthy {
+    margin-top: 10px; border-left: 4px solid var(--accent); background: var(--accent-soft);
+    border-radius: 0 12px 12px 0; padding: 16px 18px;
+  }
+  .healthy p { font-size: 15px; font-style: italic; color: #6d3d49; }
+  .healthy p + p { margin-top: 10px; }
+  .caution {
+    margin-top: 16px; font-size: 13px; color: #a08d5f;
+    background: #fbf5e6; border-radius: 10px; padding: 12px 15px;
+  }
+  .r-foot { text-align: center; margin-top: 30px; }
+  .cta-link { display: block; margin: 0 0 18px; }
+  .cta-link img {
+    width: 100%; display: block; border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(107, 98, 89, .16);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .cta-link:hover img { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(107, 98, 89, .24); }
+  .disclaimer { font-size: 12.5px; color: #b3acbc; text-align: center; margin-top: 26px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 인트로 -->
+  <section id="intro" class="screen active">
+    <img class="hand-img heart-img" src="손그림하트.jpg" alt="">
+    <div><span class="badge">개인적 욕망 분석 · 자기성찰 테스트</span></div>
+    <img class="hand-img title-img" src="찾기.jpg" alt="나의 이상적 연애 찾기">
+    <p class="lead">내가 상상하는 연애 장면을 따라가면<br>내 마음속 숨은 관계 욕구가 보입니다.</p>
+    <ul class="steps">
+      <li><span class="num">1</span><span>12가지 연애 장면 중 <b>가장 끌리는 3가지</b>를 고릅니다.</span></li>
+      <li><span class="num">2</span><span>각 장면마다 이어지는 <b>분기형 질문</b>에 답합니다.</span></li>
+      <li><span class="num">3</span><span>나의 <b>욕망 그래프</b>와 <b>관계 전략 진단</b>을 확인합니다.</span></li>
+    </ul>
+    <button class="img-btn" onclick="showPicker()"><img class="hand-img" src="테스트.jpg" alt="테스트 시작하기"></button>
+    <p class="note">약 3분 소요 · 총 12문항 · 결과는 저장되지 않습니다</p>
+  </section>
+
+  <!-- 상황 선택 -->
+  <section id="picker" class="screen">
+    <div class="picker-head">
+      <span class="badge">STEP 1</span>
+      <h2>상상만 해도 마음이 채워지는 장면은?</h2>
+      <p>가장 끌리는 상황을 <b>3가지</b> 골라주세요.</p>
+    </div>
+    <div id="sitGrid" class="grid"></div>
+    <div class="picker-foot">
+      <div class="count"><b id="selCount">0</b> / 3 선택됨</div>
+      <button id="startBtn" class="btn" disabled onclick="startQuiz()">이 장면들로 시작하기</button>
+    </div>
+  </section>
+
+  <!-- 질문 -->
+  <section id="quiz" class="screen">
+    <div class="progress"><div id="pbar" class="bar"></div></div>
+    <div class="q-meta"><span id="qStep"></span><span id="qCount"></span></div>
+    <div id="qBody"></div>
+    <div class="q-back"><button onclick="goBack()">← 이전 질문으로</button></div>
+  </section>
+
+  <!-- 결과 -->
+  <section id="result" class="screen">
+    <div class="r-head">
+      <div><span class="badge">RESULT</span></div>
+      <img class="hand-img rtitle-img" src="유형은.jpg" alt="나의 이상적 연애 유형은?!">
+      <h2 id="rTitle"></h2>
+    </div>
+
+    <!-- 섹션 1: 단추 이미지 + 한 줄 공식 + 해설 -->
+    <div class="sec sec-type">
+      <img id="rButtonImg" class="hand-img button-img" src="" alt="">
+      <div id="rHook" class="hook"></div>
+      <div id="rExplain" class="explain"></div>
+    </div>
+
+    <!-- 섹션 2: 궁합 -->
+    <div class="sec">
+      <h3>나는 어떤 단추와 잘 맞을까?</h3>
+      <div id="rMatch"></div>
+    </div>
+
+    <!-- 욕망 그래프 -->
+    <div class="sec">
+      <h3>나의 욕망 그래프</h3>
+      <div id="radarBox"></div>
+      <div id="rankList" class="rank-list"></div>
+    </div>
+
+    <!-- 섹션 3: 전략 -->
+    <div class="sec">
+      <h3>지금 나의 전략, 괜찮을까?</h3>
+      <div id="rStrategy"></div>
+    </div>
+
+    <div class="r-foot">
+      <a class="cta-link" href="https://www.instagram.com/danchu.toon?igsh=MXZzeHpjMnI1ODFtaA%3D%3D&amp;utm_source=qr" target="_blank" rel="noopener">
+        <img src="cta.jpg" alt="자퇴한 선생님 잉스타 응원 받으러 가기">
+      </a>
+      <button class="btn btn-ghost" onclick="location.reload()">테스트 다시 하기</button>
+    </div>
+    <p class="disclaimer">이 테스트는 임상 진단이 아니라, 관계 욕구를 탐색하기 위한 자기성찰 자료입니다.</p>
+  </section>
+
+</div>
+
+<script src="q1-data.js"></script>
+<script src="data.js"></script>
+<script>
+"use strict";
+
+/* ==================== 상태 ==================== */
+const state = {
+  selected: [],        // 선택한 상황 id 3개 (S01~S12)
+  steps: [],           // 질문 스텝 목록
+  stepIdx: 0,
+  answers: {}          // 상황 id → { q1Primary, q1Follow, thoughtIdx, behaviorIdx }
+};
+
+const q1ScenarioById = {};
+Q1_DATA.scenarios.forEach(s => { q1ScenarioById[s.id] = s; });
+
+/* ==================== 유틸 ==================== */
+function josa(word, jong, noJong) {
+  const code = word.charCodeAt(word.length - 1);
+  if (code < 0xAC00 || code > 0xD7A3) return word + noJong;
+  return word + (((code - 0xAC00) % 28) > 0 ? jong : noJong);
+}
+function show(id) {
+  document.querySelectorAll(".screen").forEach(el => el.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo({ top: 0 });
+}
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/* ==================== 상황 선택 ==================== */
+function showPicker() {
+  const grid = document.getElementById("sitGrid");
+  grid.innerHTML = SITUATION_LIST.map((s, i) =>
+    `<div class="sit-card" data-id="${s.id}" onclick="toggleSit('${s.id}')">
+       <span class="no">${String(i + 1).padStart(2, "0")}</span><span>${esc(s.title)}</span>
+     </div>`).join("");
+  show("picker");
+}
+function toggleSit(id) {
+  const i = state.selected.indexOf(id);
+  if (i >= 0) state.selected.splice(i, 1);
+  else if (state.selected.length < 3) state.selected.push(id);
+  document.querySelectorAll(".sit-card").forEach(card => {
+    const sel = state.selected.includes(card.dataset.id);
+    card.classList.toggle("sel", sel);
+    card.classList.toggle("dim", !sel && state.selected.length >= 3);
+  });
+  document.getElementById("selCount").textContent = state.selected.length;
+  document.getElementById("startBtn").disabled = state.selected.length !== 3;
+}
+
+/* ==================== 질문 흐름 ==================== */
+function startQuiz() {
+  state.steps = [];
+  state.stepIdx = 0;
+  state.answers = {};
+  state.selected.forEach(sid => {
+    state.answers[sid] = {};
+    state.steps.push({ sid, kind: "q1primary" });
+    state.steps.push({ sid, kind: "q1follow" });
+    state.steps.push({ sid, kind: "thought" });
+    state.steps.push({ sid, kind: "behavior" });
+  });
+  show("quiz");
+  renderStep();
+}
+
+function renderStep() {
+  const step = state.steps[state.stepIdx];
+  const sc = q1ScenarioById[step.sid];
+  const q2 = Q2_DATA[Q1_TO_Q2[step.sid]];
+  const sitIdx = state.selected.indexOf(step.sid) + 1;
+  const body = document.getElementById("qBody");
+
+  document.getElementById("pbar").style.width = (state.stepIdx / state.steps.length * 100) + "%";
+  document.getElementById("qStep").textContent = `장면 ${sitIdx} · ${sc.title}`;
+  document.getElementById("qCount").textContent = `${state.stepIdx + 1} / ${state.steps.length}`;
+
+  let html = "";
+  if (step.kind === "q1primary") {
+    const q = sc.primaryQuestion;
+    html = `<span class="q-scene">${esc(sc.title)}</span>
+      <div class="q-text">${esc(q.text)}</div>
+      <div class="opts">` +
+      q.options.map((o, i) => `<button class="opt" onclick="answer(${i})">${esc(o.text)}</button>`).join("") +
+      `</div>`;
+  } else if (step.kind === "q1follow") {
+    const chosen = state.answers[step.sid].q1Primary;
+    const fq = sc.followUpQuestions.find(f => f.id === chosen.nextQuestionId);
+    html = `<span class="q-scene">${esc(sc.title)}</span>
+      <div class="q-text">${esc(fq.text)}</div>
+      <div class="opts">` +
+      fq.options.map((o, i) => `<button class="opt" onclick="answer(${i})">${esc(o.text)}</button>`).join("") +
+      `</div>`;
+  } else if (step.kind === "thought") {
+    html = `<span class="q-scene flip">그런데, 만약에…</span>
+      <div class="q-text">${esc(q2.thoughtText)}</div>
+      <div class="opts">` +
+      q2.thoughtOptions.map((o, i) => `<button class="opt" onclick="answer(${i})">${esc(o.text)}</button>`).join("") +
+      `</div>`;
+  } else {
+    html = `<span class="q-scene flip">그렇다면, 나는…</span>
+      <div class="q-text">${esc(q2.behaviorText)}</div>
+      <div class="opts">` +
+      q2.behaviorOptions.map((t, i) => `<button class="opt" onclick="answer(${i})">${esc(t)}</button>`).join("") +
+      `</div>`;
+  }
+  body.innerHTML = html;
+  window.scrollTo({ top: 0 });
+}
+
+function answer(optIdx) {
+  const step = state.steps[state.stepIdx];
+  const sc = q1ScenarioById[step.sid];
+  const a = state.answers[step.sid];
+
+  if (step.kind === "q1primary") {
+    a.q1Primary = sc.primaryQuestion.options[optIdx];
+    a.q1Follow = undefined;
+  } else if (step.kind === "q1follow") {
+    const fq = sc.followUpQuestions.find(f => f.id === a.q1Primary.nextQuestionId);
+    a.q1Follow = fq.options[optIdx];
+  } else if (step.kind === "thought") {
+    a.thoughtIdx = optIdx;
+  } else {
+    a.behaviorIdx = optIdx;
+  }
+
+  state.stepIdx++;
+  if (state.stepIdx >= state.steps.length) renderResult();
+  else renderStep();
+}
+
+function goBack() {
+  if (state.stepIdx === 0) { show("picker"); return; }
+  state.stepIdx--;
+  renderStep();
+}
+
+/* ==================== 점수 계산 ==================== */
+function computeDesires() {
+  // 분기형 질문1: 1차 선택 1점, 2차 선택 2점
+  const total = {}, followOnly = {};
+  NEED_ORDER.forEach(n => { total[n] = 0; followOnly[n] = 0; });
+  state.selected.forEach(sid => {
+    const a = state.answers[sid];
+    total[a.q1Primary.primaryDesire] += a.q1Primary.score;
+    total[a.q1Follow.primaryDesire] += a.q1Follow.score;
+    followOnly[a.q1Follow.primaryDesire] += a.q1Follow.score;
+  });
+  const sum = NEED_ORDER.reduce((s, n) => s + total[n], 0);
+  const percent = {};
+  NEED_ORDER.forEach(n => { percent[n] = sum ? Math.round(total[n] / sum * 1000) / 10 : 0; });
+  // 순위: 총점 → 2차 점수 → 표시 순서
+  const ranked = [...NEED_ORDER].sort((x, y) =>
+    (total[y] - total[x]) || (followOnly[y] - followOnly[x]) ||
+    (NEED_ORDER.indexOf(x) - NEED_ORDER.indexOf(y)));
+  return { total, percent, ranked, top: ranked[0] };
+}
+
+function computeThreat() {
+  // 분기형 질문2 생각 문항: 주 욕구 4점, 보조 1점 / 4·5번은 유연한 재해석
+  const raw = {}, dynMax = {};
+  NEED_ORDER.forEach(n => { raw[n] = 0; dynMax[n] = 0; });
+  let reapSum = 0, activation = 0;
+
+  state.selected.forEach(sid => {
+    const q2 = Q2_DATA[Q1_TO_Q2[sid]];
+    const opt = q2.thoughtOptions[state.answers[sid].thoughtIdx];
+    if (opt.reappraisal) reapSum += opt.reappraisal;
+    else {
+      raw[opt.main] += 4;
+      if (opt.sub) raw[opt.sub] += 1;
+      activation++;
+    }
+    // 이 상황에서 각 욕구가 얻을 수 있었던 이론상 최대점수 (정규화 분모)
+    NEED_ORDER.forEach(n => {
+      let m = 0;
+      q2.thoughtOptions.forEach(o => {
+        if (o.main === n) m = Math.max(m, 4);
+        else if (o.sub === n) m = Math.max(m, 1);
+      });
+      dynMax[n] += m;
+    });
+  });
+
+  const norm = {};
+  NEED_ORDER.forEach(n => { norm[n] = dynMax[n] > 0 ? raw[n] / dynMax[n] * 100 : 0; });
+  const secure = activation === 0; // 위협 반응 없음 = 재해석 비율 75% 이상과 동치(3문항 기준)
+  const top = [...NEED_ORDER].sort((x, y) =>
+    (norm[y] - norm[x]) || (raw[y] - raw[x]) ||
+    (NEED_ORDER.indexOf(x) - NEED_ORDER.indexOf(y)))[0];
+  const reapRatio = Math.round(reapSum / 12 * 100);
+  return { raw, norm, top, secure, activation, reapRatio };
+}
+
+function computeStrategy() {
+  // 행동 문항: 1~5번 선택지가 순서대로 5개 전략에 대응
+  const count = {};
+  STRATEGY_ORDER.forEach(s => { count[s] = 0; });
+  state.selected.forEach(sid => {
+    count[STRATEGY_ORDER[state.answers[sid].behaviorIdx]]++;
+  });
+  const top = [...STRATEGY_ORDER].sort((x, y) =>
+    (count[y] - count[x]) || (STRATEGY_ORDER.indexOf(x) - STRATEGY_ORDER.indexOf(y)))[0];
+  return { count, top };
+}
+
+/* ==================== 결과 렌더링 ==================== */
+function renderResult() {
+  const desires = computeDesires();
+  const threat = computeThreat();
+  const strat = computeStrategy();
+  const topNeed = NEEDS[desires.top];
+
+  document.getElementById("pbar").style.width = "100%";
+
+  // 제목: 유형별 단추 이름
+  document.getElementById("rTitle").textContent = topNeed.button;
+
+  // 섹션 1: 단추 이미지 + 한 줄 공식 + 해설
+  const btnImg = document.getElementById("rButtonImg");
+  btnImg.src = `단추이미지_${topNeed.button}.png`;
+  btnImg.alt = topNeed.button;
+  document.getElementById("rHook").textContent = topNeed.hook;
+  document.getElementById("rExplain").innerHTML = `<p>${esc(topNeed.explain)}</p>`;
+
+  // 섹션 2: 나는 어떤 단추와 잘 맞을까?
+  document.getElementById("rMatch").innerHTML = `<p>${esc(topNeed.match)}</p>`;
+
+  // 욕망 그래프: TOP 3 손그림 도넛 + 순위 막대
+  document.getElementById("radarBox").innerHTML = donutChart(desires);
+  const maxPc = Math.max(...NEED_ORDER.map(n => desires.percent[n]), 1);
+  document.getElementById("rankList").innerHTML =
+    desires.ranked.map(n =>
+      `<div class="rank-row${n === desires.top ? " top" : ""}">
+         <span class="nm">${NEEDS[n].label}</span>
+         <span class="track"><span class="fill" style="width:${desires.percent[n] / maxPc * 100}%"></span></span>
+         <span class="pc">${desires.percent[n]}%</span>
+       </div>`).join("");
+
+  // 섹션 3: 욕구 위협 시 전략
+  document.getElementById("rStrategy").innerHTML = strategyHTML(threat, strat);
+  show("result");
+}
+
+function strategyHTML(threat, strat) {
+  const stratLabel = STRATEGIES[strat.top].label;
+  const chips = STRATEGY_ORDER.filter(s => strat.count[s] > 0)
+    .map(s => `<span class="chip">${STRATEGIES[s].label} <b>×${strat.count[s]}</b></span>`).join("");
+
+  if (threat.secure) {
+    return `
+      <div class="strat-head">${esc(SECURE_RESULT.title)}</div>
+      <p>${esc(SECURE_RESULT.body)}</p>
+      <div class="strat-sub">기대가 어긋난 순간, 내가 고른 행동</div>
+      <div class="chips">${chips}</div>`;
+  }
+
+  const need = NEEDS[threat.top];
+  const headline = `${josa(need.label, "이", "가")} 위협받을 때, 나는 [${stratLabel}] 전략을 사용하는 편입니다.`;
+  const isDirect = strat.top === "direct_communication";
+  let html = `
+    <div class="strat-head">${esc(headline)}</div>
+    <p>${esc(need.threatIntro)}</p>
+    <div class="strat-sub">${esc(STRATEGIES[strat.top].resultLabel)}</div>
+    <p>${esc(need.strategies[strat.top])}</p>
+    <div class="strat-sub">기대가 어긋난 순간, 내가 고른 행동</div>
+    <div class="chips">${chips}</div>
+    <div class="strat-sub">건강한 언어로 욕망 번역하기</div>
+    <div class="healthy">${need.healthy.map(h => `<p>“${esc(h)}”</p>`).join("")}</div>`;
+  if (threat.top === "growth") {
+    html += `<div class="caution">성장·발전 욕구는 특정 상황에 크게 의존해 측정되므로, 이 결과는 탐색적인 참고 자료로 봐주세요.</div>`;
+  }
+  if (!isDirect && strat.count.direct_communication > 0) {
+    html += `<div class="caution">직접 표현·협상을 선택한 순간도 있었어요. 그 방식이 통했던 장면을 떠올려보면, 다른 상황에서도 활용하기 쉬워집니다.</div>`;
+  }
+  return html;
+}
+
+/* ==================== TOP 3 손그림 도넛 그래프 (SVG) ==================== */
+// 참고 이미지('그래프.jpg') 팔레트: 코랄 / 분홍 / 노랑, 갈색 테두리
+const DONUT_COLORS = ["#d97757", "#e8b4ba", "#f5dd8f"]; // 1위 / 2위 / 3위
+const DONUT_ETC = "#ffffff";
+const INK_BROWN = "#6b6259";
+
+// 손으로 그린 듯한 흔들림 (결정적: 매번 같은 모양)
+function wob(seed, a) {
+  return Math.sin(a * 3 + seed) * 1.7 + Math.sin(a * 7.3 + seed * 2.1) * 1.2;
+}
+
+// 흔들리는 테두리의 도넛 조각 패스 (a0→a1 라디안)
+function sectorPath(cx, cy, a0, a1, rIn, rOut, seed) {
+  const steps = Math.max(3, Math.ceil((a1 - a0) / 0.1));
+  const pts = [];
+  for (let i = 0; i <= steps; i++) {
+    const a = a0 + (a1 - a0) * i / steps;
+    const ro = rOut + wob(seed, a);
+    pts.push([cx + ro * Math.cos(a), cy + ro * Math.sin(a)]);
+  }
+  for (let i = steps; i >= 0; i--) {
+    const a = a0 + (a1 - a0) * i / steps;
+    const ri = rIn + wob(seed + 4.7, a);
+    pts.push([cx + ri * Math.cos(a), cy + ri * Math.sin(a)]);
+  }
+  return "M" + pts.map(p => p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" L") + " Z";
+}
+
+function donutChart(desires) {
+  const size = 250, cx = size / 2, cy = size / 2, rIn = 62, rOut = 105;
+  const top3 = desires.ranked.slice(0, 3).filter(n => desires.total[n] > 0);
+  const top3Sum = top3.reduce((s, n) => s + desires.percent[n], 0);
+
+  // 조각 목록: top3 + '그 외' (12시 방향에서 시계 방향으로)
+  const parts = top3.map((n, i) => ({ pc: desires.percent[n], color: DONUT_COLORS[i] }));
+  const etcPc = Math.max(0, 100 - top3Sum);
+  if (etcPc > 0.5) parts.push({ pc: etcPc, color: DONUT_ETC });
+
+  const gapA = parts.length > 1 ? 0.055 : 0; // 조각 사이 틈(라디안)
+  let segs = "", acc = -Math.PI / 2;
+  parts.forEach((p, i) => {
+    const span = p.pc / 100 * 2 * Math.PI;
+    const a0 = acc + gapA / 2, a1 = acc + span - gapA / 2;
+    if (a1 > a0) {
+      segs += `<path d="${sectorPath(cx, cy, a0, a1, rIn, rOut, i * 3.3 + 1)}"
+        fill="${p.color}" stroke="${INK_BROWN}" stroke-width="3.2"
+        stroke-linejoin="round" stroke-linecap="round"/>`;
+    }
+    acc += span;
+  });
+
+  const svg = `<svg viewBox="0 0 ${size} ${size}" width="${size}" role="img" aria-label="나의 욕망 그래프 (상위 3개 욕구 비율)">
+    ${segs}
+    <text x="${cx}" y="${cy - 18}" text-anchor="middle" font-size="13" font-weight="800" letter-spacing="2" fill="#8a8178">TOP 1</text>
+    <text x="${cx}" y="${cy + 8}" text-anchor="middle" font-size="21" font-weight="800" fill="#d97757">${NEEDS[desires.top].label}</text>
+    <text x="${cx}" y="${cy + 33}" text-anchor="middle" font-size="16" font-weight="800" fill="#57504b">${desires.percent[desires.top]}%</text>
+  </svg>`;
+
+  const legend = top3.map((n, i) =>
+    `<div class="lg-row">
+       <span class="lg-dot" style="background:${DONUT_COLORS[i]}"></span>
+       <span class="lg-name">${NEEDS[n].label}</span>
+       <span class="lg-pc">${desires.percent[n]}%</span>
+     </div>`).join("") +
+    (top3Sum < 99.9
+      ? `<div class="lg-row etc">
+           <span class="lg-dot" style="background:${DONUT_ETC}"></span>
+           <span class="lg-name">그 외</span>
+           <span class="lg-pc">${Math.round((100 - top3Sum) * 10) / 10}%</span>
+         </div>`
+      : "");
+
+  return `<div class="donut-wrap">${svg}<div class="legend">${legend}</div></div>`;
+}
+
+/* ==================== 초기화 ==================== */
+</script>
+</body>
+</html>
